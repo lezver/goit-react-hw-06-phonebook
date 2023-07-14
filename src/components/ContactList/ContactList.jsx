@@ -1,27 +1,25 @@
 import './ContactList.scss';
-import PropTypes from 'prop-types';
+import { ContactItem } from 'components';
+import { useSelector } from 'react-redux';
 
-export const ContactList = ({ contacts, deleteContact }) => {
+export const ContactList = () => {
+  const contacts = useSelector(state => state.contacts.contacts);
+  const filter = useSelector(state => state.filter.filter);
+
+  const searchContact = () =>
+    contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+
   return (
     <ul className="phonebook__list">
-      {contacts.length !== 0 ? (
-        contacts.map(({ name, id, number }) => (
-          <li key={id}>
-            <span>{name}</span>
-            <span>{number}</span>
-            <button type="button" onClick={() => deleteContact(id)}>
-              Delete
-            </button>
-          </li>
+      {searchContact().length !== 0 ? (
+        searchContact().map(contact => (
+          <ContactItem key={contact.id} contact={contact} />
         ))
       ) : (
         <p className="phonebook__info">Sorry, but you have no contacts</p>
       )}
     </ul>
   );
-};
-
-ContactList.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  deleteContact: PropTypes.func.isRequired,
 };

@@ -1,34 +1,41 @@
 import './ContactForm.scss';
 import { nanoid } from 'nanoid';
-import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsSlice/contactsSlice';
+import Notiflix from 'notiflix';
 
-export const ContactForm = ({ addContact }) => {
-  const [name, getName] = useState('');
-  const [number, getNumber] = useState('');
+Notiflix.Notify.init({ fontSize: '20px' });
+
+export const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.contacts);
 
   const handleForm = e => {
-    const newContact = {
-      id: nanoid(),
-      name: name,
-      number: number,
-    };
-
     e.preventDefault();
 
-    addContact(newContact);
+    const name = e.target.elements.name.value;
+    const number = e.target.elements.number.value;
+
+    const newContact = {
+      id: nanoid(),
+      name,
+      number,
+    };
+    checkAddContact(newContact, name);
 
     e.target.reset();
   };
 
-  const handleChangeValue = ({ currentTarget: { name, value } }) => {
-    switch (name) {
-      case 'name':
-        return getName(value);
-      case 'number':
-        return getNumber(value);
-      default:
-        return;
+  const checkAddContact = (newContact, name) => {
+    const nameCheck = contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (!nameCheck) {
+      Notiflix.Notify.success('You have a new contact!');
+      dispatch(addContact(newContact));
+    } else {
+      Notiflix.Notify.failure(`${name} is already in contacts.`);
     }
   };
 
@@ -42,7 +49,6 @@ export const ContactForm = ({ addContact }) => {
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
-          onChange={handleChangeValue}
         />
       </label>
       <label>
@@ -53,14 +59,9 @@ export const ContactForm = ({ addContact }) => {
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
-          onChange={handleChangeValue}
         />
       </label>
       <button type="submit">Add contact</button>
     </form>
   );
-};
-
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
 };

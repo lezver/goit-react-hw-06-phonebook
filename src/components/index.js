@@ -2,6 +2,6 @@ import { App } from './App';
 import { ContactForm } from './ContactForm';
 import { Filter } from './Filter';
 import { ContactList } from './ContactList';
-import { startContacts } from './Backend';
+import { ContactItem } from './ContactItem';
 
-export { App, ContactForm, Filter, ContactList, startContacts };
+export { App, ContactForm, Filter, ContactList, ContactItem };
